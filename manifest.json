@@ -1,0 +1,12 @@
+{
+    "manifest_version": 2,
+
+    "name": "Pointy for Trello",
+    "description": "Add points to Trello.",
+    "version": "1.0",
+
+    "content_scripts": [{
+        "matches": ["https://trello.com/*"],
+        "js": ["pointy.js"]
+    }]
+}
