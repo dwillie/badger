@@ -1,3 +1,36 @@
+loadFontAwesome = function() {
+    link = document.createElement( "link" );
+    link.href  = "https://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css"
+    link.type  = "text/css";
+    link.rel   = "stylesheet";
+    link.media = "screen,print";
+
+    document.getElementsByTagName( "head" )[0].appendChild( link );
+}
+
+awesomeIcon = function(iconName) {
+    icon = document.createElement("i");
+    icon.classList.add("fa");
+    icon.classList.add("fa-" + iconName);
+
+    return icon;
+}
+
+newTagContainer = function() {
+    tagContainer = document.createElement("div");
+    tagContainer.classList.add("tags-container");
+    return tagContainer;
+}
+
+getTagsContainer = function(card) {
+    tagsContainer = card.getElementsByClassName("tags-container")[0];
+    if (!tagsContainer) {
+        card.innerHTML += newTagContainer().outerHTML;
+        tagsContainer = card.getElementsByClassName("tags-container")[0];
+    }
+    return tagsContainer;
+}
+
 getCardText = function(card) {
     return card.getElementsByClassName("js-card-name")[0].innerHTML;
 }
@@ -7,12 +40,15 @@ setCardText = function(card, text) {
 }
 
 addTag = function(card, tagText) {
-    tag = document.createElement("span");
+    tagsContainer = getTagsContainer(card);
+
+    tag = document.createElement("div");
     tag.classList.add("tag");
-    tag.innerHTML = tagText;
+    tag.innerHTML = awesomeIcon("trophy").outerHTML;
+    tag.innerHTML += " " + tagText;
 
     console.log("Adding tag");
-    card.innerHTML += tag.outerHTML
+    tagsContainer.innerHTML += tag.outerHTML;
 }
 
 processList = function(list) {
@@ -28,17 +64,22 @@ processList = function(list) {
 
         cardScore  = regexMatch[1];
         setCardText(cards[i], cardText.replace(regexMatch[0], ""));
-         addTag(cards[i], cardScore);
+        addTag(cards[i], cardScore);
     }
 }
 
-main = function() {
+refreshCycle = function() {
     lists = document.getElementsByClassName("list");
     for (var i = 0; i < lists.length; i++) {
         processList(lists[i]);
     }
 
     // setTimeout(main, 1000);
+}
+
+main = function() {
+    loadFontAwesome();
+    refreshCycle();
 }
 
 window.onload = main
