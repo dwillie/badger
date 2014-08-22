@@ -16,19 +16,8 @@ awesomeIcon = function(iconName) {
     return icon;
 }
 
-newTagContainer = function() {
-    tagContainer = document.createElement("div");
-    tagContainer.classList.add("tags-container");
-    return tagContainer;
-}
-
-getTagsContainer = function(card) {
-    tagsContainer = card.node.getElementsByClassName("tags-container")[0];
-    if (!tagsContainer) {
-        card.node.innerHTML += newTagContainer().outerHTML;
-        tagsContainer = card.node.getElementsByClassName("tags-container")[0];
-    }
-    return tagsContainer;
+getBadgesContainer = function(card) {
+    return card.node.getElementsByClassName("badges")[0];
 }
 
 getCardText = function(card) {
@@ -39,18 +28,20 @@ setCardText = function(card, text) {
     card.node.getElementsByClassName("js-card-name")[0].innerHTML = text;
 }
 
-addTag = function(card, tagText, iconName) {
-    tagsContainer = getTagsContainer(card);
+addBadge = function(card, badgeText, iconName, bgColor) {
+    badgesContainer = getBadgesContainer(card);
 
-    tag = document.createElement("div");
-    tag.classList.add("tag");
-    tag.innerHTML = awesomeIcon(iconName).outerHTML;
-    tag.innerHTML += " " + tagText;
+    badge = document.createElement("div");
+    badge.classList.add("pointy-badge");
+    badge.classList.add("badge");
+    badge.style.backgroundColor = bgColor;
+    badge.innerHTML = awesomeIcon(iconName).outerHTML;
+    badge.innerHTML += " " + badgeText;
 
-    tagsContainer.innerHTML += tag.outerHTML;
+    badgesContainer.innerHTML += badge.outerHTML;
 }
 
-processTag = function(card, reg, iconName) {
+processBadge = function(card, reg, iconName, bgColor) {
     cardText   = getCardText(card);
     regexMatch = reg.exec(cardText);
     if (!regexMatch) {
@@ -59,25 +50,29 @@ processTag = function(card, reg, iconName) {
 
     cardScore = regexMatch[1];
     setCardText(card, cardText.replace(regexMatch[0], ""));
-    addTag(card, cardScore, iconName);
+    addBadge(card, cardScore, iconName, bgColor);
 }
 
-cleanTags = function(card) {
-    getTagsContainer(card).innerHTML = "";
+cleanBadges = function(card) {
+    // TODO something less awful
+    badgesContainer = getBadgesContainer(card);
+    while (badgesContainer.getElementsByClassName("pointy-badge").length > 0) {
+        badgesContainer.getElementsByClassName("pointy-badge")[0].outerHTML = "";
+    }
 }
 
 cleanCard = function(card) {
     setCardText(card, card.text);
-    cleanTags(card);
+    cleanBadges(card);
 }
 
 processList = function(list) {
-    scoreMatcher   = new RegExp(/\((.*)\)/g);
+    scoreMatcher   = new RegExp(/\(([^\)]*)\)/g);
     hashtagMatcher = new RegExp(/\#([a-zA-Z]+)/g);
     for (var i = 0; i < list.cards.length; i++)
     {
-        processTag(list.cards[i], scoreMatcher, "trophy");
-        processTag(list.cards[i], hashtagMatcher, "tag");
+        processBadge(list.cards[i], scoreMatcher, "trophy", "#3DCD51");
+        processBadge(list.cards[i], hashtagMatcher, "tag", "#DEB74E");
     }
 }
 
@@ -99,8 +94,9 @@ refreshCycle = function(meta) {
         processList(meta.lists[i]);
     }
 
-    console.log("Reloading...");
-    setTimeout(main, 2500);
+    setTimeout(function() {
+        refreshCycle(meta);
+    }, 2500);
 }
 
 loadMeta = function(meta) {
@@ -124,8 +120,6 @@ loadMeta = function(meta) {
             };
 
             card.text = getCardText(card);
-            card.node.innerHTML += newTagContainer().outerHTML;
-
             list.cards.push(card);
         }
         meta.lists.push(list);
