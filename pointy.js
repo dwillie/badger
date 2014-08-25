@@ -71,8 +71,8 @@ processList = function(list) {
     hashtagMatcher = new RegExp(/\#([a-zA-Z]+)/g);
     for (var i = 0; i < list.cards.length; i++)
     {
-        processBadge(list.cards[i], scoreMatcher, "trophy", "#3DCD51");
-        processBadge(list.cards[i], hashtagMatcher, "tag", "#DEB74E");
+        processBadge(list.cards[i], scoreMatcher, "trophy", "#55BB55");
+        processBadge(list.cards[i], hashtagMatcher, "tag", "#666699");
     }
 }
 

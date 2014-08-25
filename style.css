@@ -1,7 +1,7 @@
 .pointy-badge {
   font-size:        smaller;
-  font-color:       #FFF;
-  padding:          3px 3px;
+  color:            #FFF !important;
+  padding:          0 3px !important;
   color:            white;
   background-color: #888;
   border-radius:    3px;
