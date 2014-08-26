@@ -90,10 +90,13 @@ cleanCard = function(card) {
 processList = function(list) {
     scoreMatcher   = new RegExp(/\(([0-9^\)]*)\)/g);
     hashtagMatcher = new RegExp(/#([a-zA-Z]+)/g);
+    dayEstMatcher  = new RegExp(/~([0-9]+)/g);
+
     for (var i = 0; i < list.cards.length; i++)
     {
         processBadge(list.cards[i], scoreMatcher, "trophy", "#55BB55");
         processBadge(list.cards[i], hashtagMatcher, "tag", "#666699");
+        processBadge(list.cards[i], dayEstMatcher, "calendar", "#BB6666");
     }
 }
 
