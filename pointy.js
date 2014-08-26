@@ -59,7 +59,7 @@ addBadge = function(card, badgeText, iconName, bgColor) {
 processBadge = function(card, reg, iconName, bgColor) {
     cardText   = getCardText(card);
     regexMatches = cardText.matchAll(reg);
-    if (regexMatches.length < 1) {
+    if (!regexMatches || regexMatches.length < 1) {
         return;
     }
 
