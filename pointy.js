@@ -1,3 +1,18 @@
+// There's probably a better way for this but I cbf
+// http://cwestblog.com/2013/02/26/javascript-string-prototype-matchall/
+// Thanks Chris West.
+String.prototype.matchAll = function(regexp) {
+  var matches = [];
+  this.replace(regexp, function() {
+    var arr = ([]).slice.call(arguments, 0);
+    var extras = arr.splice(-2);
+    arr.index = extras[0];
+    arr.input = extras[1];
+    matches.push(arr);
+  });
+  return matches.length ? matches : null;
+};
+
 loadFontAwesome = function() {
     link = document.createElement( "link" );
     link.href  = "https://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css"
@@ -43,14 +58,20 @@ addBadge = function(card, badgeText, iconName, bgColor) {
 
 processBadge = function(card, reg, iconName, bgColor) {
     cardText   = getCardText(card);
-    regexMatch = reg.exec(cardText);
-    if (!regexMatch) {
+    regexMatches = cardText.matchAll(reg);
+    if (regexMatches.length < 1) {
         return;
     }
 
-    cardScore = regexMatch[1];
-    setCardText(card, cardText.replace(regexMatch[0], ""));
-    addBadge(card, cardScore, iconName, bgColor);
+    regexMatches.forEach(function(match){
+        matchedContent = match[0]
+        badgeLabel = match[1]
+
+        cardText = cardText.replace(matchedContent, "");
+        addBadge(card, badgeLabel, iconName, bgColor);
+    });
+
+    setCardText(card, cardText);
 }
 
 cleanBadges = function(card) {
@@ -67,8 +88,8 @@ cleanCard = function(card) {
 }
 
 processList = function(list) {
-    scoreMatcher   = new RegExp(/\(([^\)]*)\)/g);
-    hashtagMatcher = new RegExp(/\#([a-zA-Z]+)/g);
+    scoreMatcher   = new RegExp(/\(([0-9^\)]*)\)/g);
+    hashtagMatcher = new RegExp(/#([a-zA-Z]+)/g);
     for (var i = 0; i < list.cards.length; i++)
     {
         processBadge(list.cards[i], scoreMatcher, "trophy", "#55BB55");
@@ -95,7 +116,7 @@ refreshCycle = function(meta) {
     }
 
     setTimeout(function() {
-        refreshCycle(meta);
+         refreshCycle(meta);
     }, 2500);
 }
 
