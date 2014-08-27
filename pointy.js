@@ -15,13 +15,13 @@ String.prototype.matchAll = function(regexp) {
 
 loadFontAwesome = function() {
     link = document.createElement( "link" );
-    link.href  = "https://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css"
+    link.href  = "https://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css";
     link.type  = "text/css";
     link.rel   = "stylesheet";
     link.media = "screen,print";
 
     document.getElementsByTagName( "head" )[0].appendChild( link );
-}
+};
 
 awesomeIcon = function(iconName) {
     icon = document.createElement("i");
@@ -29,63 +29,109 @@ awesomeIcon = function(iconName) {
     icon.classList.add("fa-" + iconName);
 
     return icon;
-}
+};
 
-getBadgesContainer = function(card) {
-    return card.node.getElementsByClassName("badges")[0];
-}
-
-getCardText = function(card) {
-    return card.node.getElementsByClassName("js-card-name")[0].innerHTML;
-}
-
-setCardText = function(card, text) {
-    card.node.getElementsByClassName("js-card-name")[0].innerHTML = text;
-}
-
-addBadge = function(card, badgeText, iconName, bgColor) {
-    badgesContainer = getBadgesContainer(card);
-
+newBadge = function(text, icon, color) {
     badge = document.createElement("div");
     badge.classList.add("pointy-badge");
     badge.classList.add("badge");
-    badge.style.backgroundColor = bgColor;
-    badge.innerHTML = awesomeIcon(iconName).outerHTML;
-    badge.innerHTML += " " + badgeText;
+    badge.style.backgroundColor = color;
+    badge.innerHTML = awesomeIcon(icon).outerHTML;
+    badge.innerHTML += " " + text;
 
+    return badge;
+};
+
+getCardBadgesContainer = function(card) {
+    return card.node.getElementsByClassName("badges")[0];
+};
+
+getCardText = function(card) {
+    return card.node.getElementsByClassName("js-card-name")[0].innerHTML;
+};
+
+setCardText = function(card, text) {
+    card.node.getElementsByClassName("js-card-name")[0].innerHTML = text;
+};
+
+addCardBadge = function(card, badgeText, iconName, bgColor) {
+    badgesContainer = getCardBadgesContainer(card);
+    badge = newBadge(badgeText, iconName, bgColor);
     badgesContainer.innerHTML += badge.outerHTML;
-}
+};
 
-processBadge = function(card, reg, iconName, bgColor) {
-    cardText   = getCardText(card);
+addValueToCard = function(card, field, value) {
+    if (field.indexOf("[]") != -1) {
+        fieldName = field.replace("[]", "");
+        if (!card[fieldName]) {
+            card[fieldName] = [];
+        }
+        card[fieldName].push(value);
+    } else {
+        card[field] = value;
+    }
+};
+
+processCardBadge = function(card, reg, fieldName, iconName, bgColor) {
+    cardText     = getCardText(card);
     regexMatches = cardText.matchAll(reg);
     if (!regexMatches || regexMatches.length < 1) {
         return;
     }
 
     regexMatches.forEach(function(match){
-        matchedContent = match[0]
-        badgeLabel = match[1]
+        fullMatch     = match[0];
+        matchContents = match[1];
 
-        cardText = cardText.replace(matchedContent, "");
-        addBadge(card, badgeLabel, iconName, bgColor);
+        addValueToCard(card, fieldName, matchContents);
+        cardText = cardText.replace(fullMatch, "");
+        addCardBadge(card, matchContents, iconName, bgColor);
     });
 
     setCardText(card, cardText);
-}
+};
 
-cleanBadges = function(card) {
+cleanCardBadges = function(card) {
     // TODO something less awful
-    badgesContainer = getBadgesContainer(card);
+    badgesContainer = getCardBadgesContainer(card);
     while (badgesContainer.getElementsByClassName("pointy-badge").length > 0) {
         badgesContainer.getElementsByClassName("pointy-badge")[0].outerHTML = "";
     }
-}
+};
 
 cleanCard = function(card) {
     setCardText(card, card.text);
-    cleanBadges(card);
-}
+    cleanCardBadges(card);
+};
+
+getListBadgesContainer = function(list) {
+    badgesContainer = list.node.getElementsByClassName("pointy-list-badges")[0];
+    if (!badgesContainer) {
+        badgesContainer = document.createElement("div");
+        badgesContainer.classList.add("pointy-list-badges");
+        badgesContainer.classList.add("badges");
+        // Oof!
+        list.node.getElementsByClassName("list-header")[0].innerHTML += badgesContainer.outerHTML;
+        return getListBadgesContainer(list);
+    }
+
+    return badgesContainer;
+};
+
+addListBadge = function(list, badgeText, badgeIcon, badgeColor) {
+    badgesContainer = getListBadgesContainer(list);
+    badge = newBadge(badgeText, badgeIcon, badgeColor);
+    badgesContainer.innerHTML += badge.outerHTML;
+};
+
+processListBadge = function(list, fieldName, iconName, badgeColor, reduceEval, initialValue) {
+    result = list.cards.reduce(function(previousValue, currentValue, index, array) {
+        return eval(reduceEval);
+    }, initialValue);
+
+    list[fieldName] = result;
+    addListBadge(list, result, iconName, badgeColor);
+};
 
 processList = function(list) {
     scoreMatcher   = new RegExp(/\(([0-9^\)]*)\)/g);
@@ -94,18 +140,20 @@ processList = function(list) {
 
     for (var i = 0; i < list.cards.length; i++)
     {
-        processBadge(list.cards[i], scoreMatcher, "trophy", "#55BB55");
-        processBadge(list.cards[i], hashtagMatcher, "tag", "#666699");
-        processBadge(list.cards[i], dayEstMatcher, "calendar", "#BB6666");
+        processCardBadge(list.cards[i], scoreMatcher, "score", "trophy", "#55BB55");
+        processCardBadge(list.cards[i], hashtagMatcher, "tags[]", "tag", "#666699");
+        processCardBadge(list.cards[i], dayEstMatcher, "daysEstimate", "calendar", "#BB6666");
     }
-}
+
+    processListBadge(list, "totalScore", "trophy", "#55BB55", "previousValue + parseInt(currentValue.score, 10)", 0);
+};
 
 clearList = function(list) {
     for (var i = 0; i < list.cards.length; i++)
     {
         cleanCard(list.cards[i]);
     }
-}
+};
 
 refreshCycle = function(meta) {
     for (var i = 0; i < meta.lists.length; i++) {
@@ -118,10 +166,12 @@ refreshCycle = function(meta) {
         processList(meta.lists[i]);
     }
 
-    setTimeout(function() {
-         refreshCycle(meta);
-    }, 2500);
-}
+    console.log(meta);
+
+    // setTimeout(function() {
+    //      refreshCycle(meta);
+    //}, 2500);
+};
 
 loadMeta = function(meta) {
     meta.lists = [];
@@ -148,7 +198,7 @@ loadMeta = function(meta) {
         }
         meta.lists.push(list);
     }
-}
+};
 
 main = function() {
     loadFontAwesome();
@@ -158,6 +208,6 @@ main = function() {
     };
     loadMeta(meta);
     refreshCycle(meta);
-}
+};
 
-window.onload = main
+window.onload = main;
