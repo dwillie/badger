@@ -146,6 +146,8 @@ processList = function(list) {
     }
 
     processListBadge(list, "totalScore", "trophy", "#55BB55", "previousValue + parseInt(currentValue.score, 10)", 0);
+    processListBadge(list, "totalDays", "calendar", "#BB6666", "previousValue + parseInt(currentValue.daysEstimate, 10)", 0);
+
 };
 
 clearList = function(list) {
