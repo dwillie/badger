@@ -125,8 +125,10 @@ addListBadge = function(list, badgeText, badgeIcon, badgeColor) {
 };
 
 processListBadge = function(list, fieldName, iconName, badgeColor, reduceEval, initialValue) {
-    result = list.cards.reduce(function(previousValue, currentValue, index, array) {
-        return eval(reduceEval);
+    var result = list.cards.reduce(function(previousValue, currentValue, index, array) {
+        var result = previousValue;
+        eval(reduceEval);
+        return result;
     }, initialValue);
 
     list[fieldName] = result;
@@ -145,8 +147,8 @@ processList = function(list) {
         processCardBadge(list.cards[i], dayEstMatcher, "daysEstimate", "calendar", "#BB6666");
     }
 
-    processListBadge(list, "totalScore", "trophy", "#55BB55", "previousValue + parseInt(currentValue.score, 10)", 0);
-    processListBadge(list, "totalDays", "calendar", "#BB6666", "previousValue + parseInt(currentValue.daysEstimate, 10)", 0);
+    processListBadge(list, "totalScore", "trophy", "#55BB55", "if (!currentValue.score) { result = previousValue; } else { result = previousValue + parseInt(currentValue.score, 10); }", 0);
+    processListBadge(list, "totalDays", "calendar", "#BB6666", "if (!currentValue.daysEstimate) { result = previousValue; } else { result = previousValue + parseInt(currentValue.daysEstimate, 10); }", 0);
 
 };
 
