@@ -1,13 +1,13 @@
 {
     "manifest_version": 2,
 
-    "name": "Pointy for Trello",
-    "description": "Add points to Trello.",
+    "name": "Badger",
+    "description": "Add custom badges to Trello.",
     "version": "1.0",
 
     "content_scripts": [{
         "matches": [ "https://trello.com/*", "file:///*" ],
-        "js": [ "pointy.js" ],
+        "js": [ "badger.js" ],
         "css": [
             "style.css"
         ]
