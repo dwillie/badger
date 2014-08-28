@@ -31,11 +31,16 @@ awesomeIcon = function(iconName) {
     return icon;
 };
 
-newBadge = function(text, icon, color) {
+newBadge = function(text, icon, fontColor, badgeColor, fontSize, fontWeight) {
     badge = document.createElement("div");
     badge.classList.add("pointy-badge");
     badge.classList.add("badge");
-    badge.style.backgroundColor = color;
+
+    badge.style.color = fontColor;
+    badge.style.backgroundColor = badgeColor;
+    badge.style.fontSize = fontSize;
+    badge.style.fontWeight = fontWeight;
+
     badge.innerHTML = awesomeIcon(icon).outerHTML;
     badge.innerHTML += " " + text;
 
@@ -54,9 +59,9 @@ setCardText = function(card, text) {
     card.node.getElementsByClassName("js-card-name")[0].innerHTML = text;
 };
 
-addCardBadge = function(card, badgeText, iconName, bgColor) {
+addCardBadge = function(card, badgeText, iconName, fontColor, badgeColor, fontSize, fontWeight) {
     badgesContainer = getCardBadgesContainer(card);
-    badge = newBadge(badgeText, iconName, bgColor);
+    badge = newBadge(badgeText, iconName, fontColor, badgeColor, fontSize, fontWeight);
     badgesContainer.innerHTML += badge.outerHTML;
 };
 
@@ -72,7 +77,7 @@ addValueToCard = function(card, field, value) {
     }
 };
 
-processCardBadge = function(card, reg, fieldName, iconName, bgColor) {
+processCardBadge = function(card, reg, fieldName, iconName, fontColor, badgeColor, fontSize, fontWeight) {
     cardText     = getCardText(card);
     regexMatches = cardText.matchAll(reg);
     if (!regexMatches || regexMatches.length < 1) {
@@ -85,7 +90,7 @@ processCardBadge = function(card, reg, fieldName, iconName, bgColor) {
 
         addValueToCard(card, fieldName, matchContents);
         cardText = cardText.replace(fullMatch, "");
-        addCardBadge(card, matchContents, iconName, bgColor);
+        addCardBadge(card, matchContents, iconName, fontColor, badgeColor, fontSize, fontWeight);
     });
 
     setCardText(card, cardText);
@@ -118,13 +123,13 @@ getListBadgesContainer = function(list) {
     return badgesContainer;
 };
 
-addListBadge = function(list, badgeText, badgeIcon, badgeColor) {
+addListBadge = function(list, badgeText, badgeIcon, fontColor, badgeColor, fontSize, fontWeight) {
     badgesContainer = getListBadgesContainer(list);
-    badge = newBadge(badgeText, badgeIcon, badgeColor);
+    badge = newBadge(badgeText, badgeIcon, fontColor, badgeColor, fontSize, fontWeight);
     badgesContainer.innerHTML += badge.outerHTML;
 };
 
-processListBadge = function(list, fieldName, iconName, badgeColor, reduceEval, initialValue) {
+processListBadge = function(list, fieldName, iconName, fontColor, badgeColor, fontSize, fontWeight, reduceEval, initialValue) {
     var result = list.cards.reduce(function(previousValue, currentValue, index, array) {
         var result = previousValue;
         eval(reduceEval);
@@ -132,7 +137,7 @@ processListBadge = function(list, fieldName, iconName, badgeColor, reduceEval, i
     }, initialValue);
 
     list[fieldName] = result;
-    addListBadge(list, result, iconName, badgeColor);
+    addListBadge(list, result, iconName, fontColor, badgeColor, fontSize, fontWeight);
 };
 
 processList = function(list) {
@@ -140,16 +145,18 @@ processList = function(list) {
     hashtagMatcher = new RegExp(/#([a-zA-Z]+)/g);
     dayEstMatcher  = new RegExp(/~([0-9]+)/g);
 
+    var fontColor = "#FFF", fontSize = "smaller", fontWeight = "400";
     for (var i = 0; i < list.cards.length; i++)
     {
-        processCardBadge(list.cards[i], scoreMatcher, "score", "trophy", "#55BB55");
-        processCardBadge(list.cards[i], hashtagMatcher, "tags[]", "tag", "#666699");
-        processCardBadge(list.cards[i], dayEstMatcher, "daysEstimate", "calendar", "#BB6666");
+        processCardBadge(list.cards[i], scoreMatcher, "score", "trophy", fontColor, "#55BB55", fontSize, fontWeight);
+        processCardBadge(list.cards[i], hashtagMatcher, "tags[]", "tag", fontColor, "#666699", fontSize, fontWeight);
+        processCardBadge(list.cards[i], dayEstMatcher, "daysEstimate", "calendar", fontColor, "#BB6666", fontSize, fontWeight);
     }
 
-    processListBadge(list, "totalScore", "trophy", "#55BB55", "if (!currentValue.score) { result = previousValue; } else { result = previousValue + parseInt(currentValue.score, 10); }", 0);
-    processListBadge(list, "totalDays", "calendar", "#BB6666", "if (!currentValue.daysEstimate) { result = previousValue; } else { result = previousValue + parseInt(currentValue.daysEstimate, 10); }", 0);
-
+    processListBadge(list, "totalScore", "trophy", "#55BB55", "none", "16px", "300",
+                     "if (!currentValue.score) { result = previousValue; } else { result = previousValue + parseInt(currentValue.score, 10); }", 0);
+    processListBadge(list, "totalDays", "calendar", "#BB6666", "none", "16px", "300",
+                     "if (!currentValue.daysEstimate) { result = previousValue; } else { result = previousValue + parseInt(currentValue.daysEstimate, 10); }", 0);
 };
 
 clearList = function(list) {
