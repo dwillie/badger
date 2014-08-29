@@ -1,12 +1,12 @@
 .pointy-badge {
-  padding:          0 3px !important;
-  border-radius:    3px;
+  padding:       0 3px !important;
+  border-radius: 3px;
 }
 
 .pointy-list-badges {
-  margin: 4px 0 -4px 26px;
+  margin:  4px 0 -4px 26px;
   display: block;
-  width: 100%;
+  width:   100%;
 }
 
 .pointy-list-badges > .badge {
