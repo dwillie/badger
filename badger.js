@@ -140,6 +140,13 @@ processListBadge = function(list, fieldName, iconName, fontColor, badgeColor, fo
     addListBadge(list, result, iconName, fontColor, badgeColor, fontSize, fontWeight);
 };
 
+clearList = function(list) {
+    for (var i = 0; i < list.cards.length; i++)
+    {
+        cleanCard(list.cards[i]);
+    }
+};
+
 processList = function(list) {
     scoreMatcher   = new RegExp(/\(([0-9^\)]*)\)/g);
     hashtagMatcher = new RegExp(/#([a-zA-Z]+)/g);
@@ -155,15 +162,7 @@ processList = function(list) {
 
     processListBadge(list, "totalScore", "trophy", "#55BB55", "none", "16px", "300",
                      "if (!currentValue.score) { result = previousValue; } else { result = previousValue + parseInt(currentValue.score, 10); }", 0);
-    processListBadge(list, "totalDays", "calendar", "#BB6666", "none", "16px", "300",
-                     "if (!currentValue.daysEstimate) { result = previousValue; } else { result = previousValue + parseInt(currentValue.daysEstimate, 10); }", 0);
-};
-
-clearList = function(list) {
-    for (var i = 0; i < list.cards.length; i++)
-    {
-        cleanCard(list.cards[i]);
-    }
+    processListBadge(list, "totalDays", "calendar", "#BB6666", "none", "12px", "300", "if (!currentValue.daysEstimate) { result = previousValue; } else { result = previousValue + parseInt(currentValue.daysEstimate, 10); }; if (index == array.length - 1) { result = '' + Math.floor(result / 7) + ' weeks and ' + result % 7 + ' days.';  }", 0);
 };
 
 refreshCycle = function(meta) {
