@@ -129,13 +129,8 @@ addListBadge = function(list, badgeText, badgeIcon, fontColor, badgeColor, fontS
     badgesContainer.innerHTML += badge.outerHTML;
 };
 
-processListBadge = function(list, fieldName, iconName, fontColor, badgeColor, fontSize, fontWeight, reduceEval, initialValue) {
-    var result = list.cards.reduce(function(previousValue, currentValue, index, array) {
-        var result = previousValue;
-        eval(reduceEval);
-        return result;
-    }, initialValue);
-
+processListBadge = function(list, fieldName, iconName, fontColor, badgeColor, fontSize, fontWeight, reduceFunc, initialValue) {
+    var result = list.cards.reduce(reduceFunc, initialValue);
     list[fieldName] = result;
     addListBadge(list, result, iconName, fontColor, badgeColor, fontSize, fontWeight);
 };
@@ -147,7 +142,7 @@ clearList = function(list) {
     }
 };
 
-processList = function(list) {
+processList = function(list, config) {
     scoreMatcher   = new RegExp(/\(([0-9^\)]*)\)/g);
     hashtagMatcher = new RegExp(/#([a-zA-Z]+)/g);
     dayEstMatcher  = new RegExp(/~([0-9]+)/g);
@@ -155,28 +150,33 @@ processList = function(list) {
     var fontColor = "#FFF", fontSize = "smaller", fontWeight = "400";
     for (var i = 0; i < list.cards.length; i++)
     {
-        processCardBadge(list.cards[i], scoreMatcher, "score", "trophy", fontColor, "#55BB55", fontSize, fontWeight);
-        processCardBadge(list.cards[i], hashtagMatcher, "tags[]", "tag", fontColor, "#666699", fontSize, fontWeight);
-        processCardBadge(list.cards[i], dayEstMatcher, "daysEstimate", "calendar", fontColor, "#BB6666", fontSize, fontWeight);
+        for (var j = 0; j < config.cardBadges.length; j++) {
+            var badgeConf = config.cardBadges[j];
+
+            processCardBadge(list.cards[i], badgeConf.regex,
+                             badgeConf.field, badgeConf.icon,
+                             badgeConf.textColor, badgeConf.bgColor,
+                             badgeConf.fontSize, badgeConf.fontWeight);
+        }
     }
 
-    processListBadge(list, "totalScore", "trophy", "#55BB55", "none", "16px", "300",
-                     "if (!currentValue.score) { result = previousValue; } else { result = previousValue + parseInt(currentValue.score, 10); }", 0);
-    processListBadge(list, "totalDays", "calendar", "#BB6666", "none", "12px", "300", "if (!currentValue.daysEstimate) { result = previousValue; } else { result = previousValue + parseInt(currentValue.daysEstimate, 10); }; if (index == array.length - 1) { result = '' + Math.floor(result / 7) + ' weeks and ' + result % 7 + ' days.';  }", 0);
+    for (var k = 0; k < config.listBadges.length; k++) {
+        var listBadgeConf = config.listBadges[k];
+        processListBadge(list, listBadgeConf.field,     listBadgeConf.icon,
+                               listBadgeConf.textColor, listBadgeConf.bgColor,
+                               listBadgeConf.fontSize,  listBadgeConf.fontWeight,
+                               listBadgeConf.reduce,    listBadgeConf.reduceInit);
+    }
 };
 
-refreshCycle = function(meta) {
+refreshCycle = function(meta, config) {
     for (var i = 0; i < meta.lists.length; i++) {
         clearList(meta.lists[i]);
     }
 
-    loadMeta(meta);
-
     for (i = 0; i < meta.lists.length; i++) {
-        processList(meta.lists[i]);
+        processList(meta.lists[i], config);
     }
-
-    console.log(meta);
 
     // setTimeout(function() {
     //      refreshCycle(meta);
@@ -213,11 +213,77 @@ loadMeta = function(meta) {
 main = function() {
     loadFontAwesome();
 
+    var config = {
+        cardBadges: [
+            {
+                name: "Score",
+                field: "score",
+                icon: "trophy",
+                regex: /\(([0-9^\)]*)\)/g,
+                textColor: "#fff",
+                bgColor: "#55BB55",
+                fontSize: "smaller",
+                fontWeight: "400"
+            },
+            {
+                name: "Tags",
+                field: "tags[]",
+                icon: "tag",
+                regex: /#([a-zA-Z]+)/g,
+                textColor: "#fff",
+                bgColor: "#666699",
+                fontSize: "smaller",
+                fontWeight: "400"
+            },
+            {
+                name: "Days Estimate",
+                field: "daysEstimate",
+                icon: "calendar",
+                regex: /~([0-9]+)/g,
+                textColor: "#fff",
+                bgColor: "#BB6666",
+                fontSize: "smaller",
+                fontWeight: "400"
+            }
+        ],
+        listBadges: [
+            {
+                name: "Total Score",
+                field: "totalScore",
+                icon: "trophy",
+                textColor: "#55BB55",
+                bgColor: "none",
+                fontSize: "16px",
+                fontWeight: "300",
+                reduce: function(previousValue, currentValue, index, array) {
+                    if (!currentValue.score) { return previousValue; } else { return previousValue + parseInt(currentValue.score, 10); }
+                },
+                reduceInit: 0
+            },
+            {
+                name: "Total Time",
+                field: "length",
+                icon: "calendar",
+                textColor: "#BB6666",
+                bgColor: "none",
+                fontSize: "12px",
+                fontWeight: "300",
+                reduce: function(previousValue, currentValue, index, array) {
+                    var result;
+                    if (!currentValue.daysEstimate) { result = previousValue; } else { result = previousValue + parseInt(currentValue.daysEstimate, 10); }
+                    if (index == array.length - 1) { return "" + result / 7 + " weeks and " + result % 7 + " days."; }
+                    return result;
+                },
+                reduceInit: 0
+            }
+        ]
+    };
+
     var meta = {
         lists: []
     };
     loadMeta(meta);
-    refreshCycle(meta);
+    refreshCycle(meta, config);
 };
 
 window.onload = main;
