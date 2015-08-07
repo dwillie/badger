@@ -47,13 +47,13 @@ chrome.runtime.onInstalled.addListener(function() {
                         bgColor: "none",
                         fontSize: "16px",
                         fontWeight: "300",
-                        reduce: "function(previousValue, currentValue, index, array) { \
-                            if (!currentValue.score) { \
-                                return previousValue; \
-                            } else { \
-                                return previousValue + parseInt(currentValue.score, 10); \
-                            } \
-                        }",
+                        reduce: (function(previousValue, currentValue, index, array) {
+                            if (!currentValue.score) {
+                                return previousValue;
+                            } else {
+                                return previousValue + parseInt(currentValue.score, 10);
+                            }
+                        }).toString(),
                         reduceInit: 0
                     },
                     {
@@ -64,24 +64,24 @@ chrome.runtime.onInstalled.addListener(function() {
                         bgColor: "none",
                         fontSize: "12px",
                         fontWeight: "300",
-                        reduce: "function(previousValue, currentValue, index, array) { \
-                            var result; \
-                            if (!currentValue.daysEstimate) { \
-                                result = previousValue; \
-                            } else { \
-                                result  = previousValue + parseInt(currentValue.daysEstimate, 10); \
-                            } \
-                            if (index == array.length - 1) { \
-                                if (result > 7) { \
-                                    return '' + Math.floor(result / 7) + ' weeks and ' + result % 7 + ' days.'; \
-                                } else if (result > 0) { \
-                                    return '' + result + ' days.'; \
-                                } else { \
-                                    return 0; \
-                                } \
-                            } \
-                            return result; \
-                        }",
+                        reduce: (function(previousValue, currentValue, index, array) {
+                            var result;
+                            if (!currentValue.daysEstimate) {
+                                result = previousValue;
+                            } else {
+                                result  = previousValue + parseInt(currentValue.daysEstimate, 10);
+                            }
+                            if (index == array.length - 1) {
+                                if (result > 7) {
+                                    return '' + Math.floor(result / 7) + ' weeks and ' + result % 7 + ' days.';
+                                } else if (result > 0) {
+                                    return '' + result + ' days.';
+                                } else {
+                                    return 0;
+                                }
+                            }
+                            return result;
+                        }).toString(),
                         reduceInit: 0
                     }
                 ]
