@@ -8,6 +8,26 @@ chrome.runtime.onInstalled.addListener(function() {
             var defaultConfig = {
                 cardBadges: [
                     {
+                        name: "ID",
+                        field: "id",
+                        icon: "globe",
+                        regex: "#([0-9]+)",
+                        textColor: "#fff",
+                        bgColor: "#669999",
+                        fontSize: "smaller",
+                        fontWeight: "400"
+                    },
+                    {
+                        name: "Dependency",
+                        field: "dependency",
+                        icon: "asterisk",
+                        regex: "d\\(([0-9^\\)]*)\\)",
+                        textColor: "#fff",
+                        bgColor: "#BC5544",
+                        fontSize: "smaller",
+                        fontWeight: "400"
+                    },
+                    {
                         name: "Score",
                         field: "score",
                         icon: "trophy",
