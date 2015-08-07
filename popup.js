@@ -5,7 +5,6 @@ configEditor.getSession().setMode("ace/mode/json");
 
 loadConfig = function() {
    chrome.storage.sync.get("badgerConfig", function(result) {
-       alert(result.badgerConfig);
        configEditor.setValue(result.badgerConfig);
    });
 };
@@ -18,5 +17,4 @@ saveConfig = function() {
 };
 
 document.getElementById("save-button").onclick = saveConfig;
-document.getElementById("cancel-button").onclick = loadConfig;
 loadConfig();
