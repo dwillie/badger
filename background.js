@@ -92,8 +92,8 @@ chrome.runtime.onInstalled.addListener(function() {
                                 result  = previousValue + parseInt(currentValue.daysEstimate, 10);
                             }
                             if (index == array.length - 1) {
-                                if (result > 7) {
-                                    return '' + Math.floor(result / 7) + ' weeks and ' + result % 7 + ' days.';
+                                if (result > 5) {
+                                    return '' + Math.floor(result / 5) + ' weeks and ' + result % 5 + ' days.';
                                 } else if (result > 0) {
                                     return '' + result + ' days.';
                                 } else {
