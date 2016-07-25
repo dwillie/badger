@@ -47,131 +47,13 @@ newBadge = function(text, icon, fontColor, badgeColor, fontSize, fontWeight) {
     return badge;
 };
 
-getCardBadgesContainer = function(card) {
-    return card.node.getElementsByClassName("badges")[0];
-};
-
-getCardText = function(card) {
-    return card.node.getElementsByClassName("js-card-name")[0].innerHTML;
-};
-
-setCardText = function(card, text) {
-    card.node.getElementsByClassName("js-card-name")[0].innerHTML = text;
-};
-
-addCardBadge = function(card, badgeText, iconName, fontColor, badgeColor, fontSize, fontWeight) {
-    badgesContainer = getCardBadgesContainer(card);
-    badge = newBadge(badgeText, iconName, fontColor, badgeColor, fontSize, fontWeight);
-    badgesContainer.innerHTML += badge.outerHTML;
-};
-
-addValueToCard = function(card, field, value) {
-    if (field.indexOf("[]") != -1) {
-        fieldName = field.replace("[]", "");
-        if (!card[fieldName]) {
-            card[fieldName] = [];
-        }
-        card[fieldName].push(value);
-    } else {
-        card[field] = value;
-    }
-};
-
-processCardBadge = function(card, reg, fieldName, iconName, fontColor, badgeColor, fontSize, fontWeight) {
-    cardText     = getCardText(card);
-    regexMatches = cardText.matchAll(reg);
-    if (!regexMatches || regexMatches.length < 1) {
-        return;
-    }
-
-    regexMatches.forEach(function(match){
-        fullMatch     = match[0];
-        matchContents = match[1];
-
-        addValueToCard(card, fieldName, matchContents);
-        cardText = cardText.replace(fullMatch, "");
-        addCardBadge(card, matchContents, iconName, fontColor, badgeColor, fontSize, fontWeight);
-    });
-
-    setCardText(card, cardText);
-};
-
-cleanCardBadges = function(card) {
-    // TODO something less awful
-    badgesContainer = getCardBadgesContainer(card);
-    while (badgesContainer.getElementsByClassName("pointy-badge").length > 0) {
-        badgesContainer.getElementsByClassName("pointy-badge")[0].outerHTML = "";
-    }
-};
-
-cleanCard = function(card) {
-    setCardText(card, card.text);
-    cleanCardBadges(card);
-};
-
-getListBadgesContainer = function(list) {
-    badgesContainer = list.node.getElementsByClassName("pointy-list-badges")[0];
-    if (!badgesContainer) {
-        badgesContainer = document.createElement("div");
-        badgesContainer.classList.add("pointy-list-badges");
-        badgesContainer.classList.add("badges");
-        // Oof!
-        list.node.getElementsByClassName("list-header")[0].innerHTML += badgesContainer.outerHTML;
-        return getListBadgesContainer(list);
-    }
-
-    return badgesContainer;
-};
-
-addListBadge = function(list, badgeText, badgeIcon, fontColor, badgeColor, fontSize, fontWeight) {
-    badgesContainer = getListBadgesContainer(list);
-    badge = newBadge(badgeText, badgeIcon, fontColor, badgeColor, fontSize, fontWeight);
-    badgesContainer.innerHTML += badge.outerHTML;
-};
-
-processListBadge = function(list, fieldName, iconName, fontColor, badgeColor, fontSize, fontWeight, reduceFunc, initialValue) {
-    var result = list.cards.reduce(reduceFunc, initialValue);
-    list[fieldName] = result;
-    addListBadge(list, result, iconName, fontColor, badgeColor, fontSize, fontWeight);
-};
-
-clearList = function(list) {
-    for (var i = 0; i < list.cards.length; i++)
-    {
-        cleanCard(list.cards[i]);
-    }
-};
-
-processList = function(list, config) {
-    var fontColor = "#FFF", fontSize = "smaller", fontWeight = "400";
-    for (var i = 0; i < list.cards.length; i++)
-    {
-        for (var j = 0; j < config.cardBadges.length; j++) {
-            var badgeConf = config.cardBadges[j];
-
-            processCardBadge(list.cards[i], badgeConf.regex,
-                             badgeConf.field, badgeConf.icon,
-                             badgeConf.textColor, badgeConf.bgColor,
-                             badgeConf.fontSize, badgeConf.fontWeight);
-        }
-    }
-
-    for (var k = 0; k < config.listBadges.length; k++) {
-        var listBadgeConf = config.listBadges[k];
-        processListBadge(list, listBadgeConf.field,     listBadgeConf.icon,
-                               listBadgeConf.textColor, listBadgeConf.bgColor,
-                               listBadgeConf.fontSize,  listBadgeConf.fontWeight,
-                               listBadgeConf.reduce,    listBadgeConf.reduceInit);
-    }
-};
-
 refreshCycle = function(meta, config) {
     for (var i = 0; i < meta.lists.length; i++) {
-        clearList(meta.lists[i]);
+        meta.lists[i].clear();
     }
 
     for (i = 0; i < meta.lists.length; i++) {
-        processList(meta.lists[i], config);
+        meta.lists[i].process(config);
     }
 
     // setTimeout(function() {
@@ -180,30 +62,22 @@ refreshCycle = function(meta, config) {
 };
 
 loadMeta = function(meta) {
-    meta.lists = [];
-    var lists = document.getElementsByClassName("list");
-    for (var i = 0; i < lists.length; i++) {
-        if (lists[i].classList.contains("add-list")) {
-            continue;
+    meta.lists    = [];
+    var lists     = [];
+    var listNodes = Array.prototype.slice.call(document.getElementsByClassName("list"));
+    listNodes.forEach(function(listNode) {
+        if (listNode.classList.contains("add-list")) {
+            return;
         }
 
-        var list = {
-            pageIndex: i,
-            node: lists[i],
-            cards: []
-        };
+        var list = new List(0, listNode, []);
+        var cardNodes = Array.prototype.slice.call(list.node.getElementsByClassName("list-card"));
+        cardNodes.forEach(function(cardNode) {
+            list.cards.push(new Card(cardNode));
+        });
 
-        var cards = list.node.getElementsByClassName("list-card");
-        for (var j = 0; j < cards.length; j++) {
-            var card = {
-                node: cards[j]
-            };
-
-            card.text = getCardText(card);
-            list.cards.push(card);
-        }
         meta.lists.push(list);
-    }
+    });
 };
 
 start = function(config) {
