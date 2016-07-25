@@ -37,7 +37,17 @@ newBadge = function(text, icon, fontColor, badgeColor, fontSize, fontWeight) {
     badge.classList.add("badge");
 
     badge.style.color = fontColor;
-    badge.style.backgroundColor = badgeColor;
+
+    if (badgeColor === "func") {
+        var hue = 0;
+        for (var i = 0; i < text.length; i++) { hue += text.charCodeAt(i); }
+        hue = hue % 360;
+        console.log("Determined Hue to be " + hue);
+        badge.style.backgroundColor = ("hsl(" + hue.toString() + ", 45%, 60%)");
+    } else {
+        badge.style.backgroundColor = badgeColor;
+    }
+
     badge.style.fontSize = fontSize;
     badge.style.fontWeight = fontWeight;
 

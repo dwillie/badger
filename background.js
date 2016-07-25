@@ -43,7 +43,7 @@ chrome.runtime.onInstalled.addListener(function() {
                         icon: "tag",
                         regex: "#([a-zA-Z]+)",
                         textColor: "#fff",
-                        bgColor: "#666699",
+                        bgColor: "func",
                         fontSize: "smaller",
                         fontWeight: "400"
                     },
