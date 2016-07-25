@@ -42,7 +42,6 @@ newBadge = function(text, icon, fontColor, badgeColor, fontSize, fontWeight) {
         var hue = 0;
         for (var i = 0; i < text.length; i++) { hue += text.charCodeAt(i); }
         hue = hue % 360;
-        console.log("Determined Hue to be " + hue);
         badge.style.backgroundColor = ("hsl(" + hue.toString() + ", 45%, 60%)");
     } else {
         badge.style.backgroundColor = badgeColor;
@@ -120,6 +119,7 @@ storageCallback = function(result) {
 };
 
 loadConfig = function() {
+    console.log("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
     chrome.storage.sync.get("badgerConfig", storageCallback);
 };
 
