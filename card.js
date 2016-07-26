@@ -43,10 +43,10 @@ function Card(node) {
             this.node.getElementsByClassName("js-card-name")[0].innerHTML = text;
         },
 
-        addBadge: function(badgeText, iconName, fontColor, badgeColor, fontSize, fontWeight) {
+        addBadge: function(fieldName, badgeText, iconName, fontColor, badgeColor, fontSize, fontWeight) {
             var badgesContainer = this.badgesContainer();
-            badge = newBadge(badgeText, iconName, fontColor, badgeColor, fontSize, fontWeight);
-            badgesContainer.innerHTML += badge.outerHTML;
+            badge = newBadge(fieldName, badgeText, iconName, fontColor, badgeColor, fontSize, fontWeight);
+            badgesContainer.appendChild(badge);
         },
 
         addValue: function(field, value) {
@@ -76,7 +76,7 @@ function Card(node) {
 
                 this.addValue(fieldName, matchContents);
                 cardText = cardText.replace(fullMatch, "");
-                this.addBadge(matchContents, iconName, fontColor, badgeColor, fontSize, fontWeight);
+                this.addBadge(fieldName, matchContents, iconName, fontColor, badgeColor, fontSize, fontWeight);
             }
 
             this.setText(cardText);
