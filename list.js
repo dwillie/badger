@@ -20,23 +20,19 @@ function List(pageIndex, node, cards) {
             return badgesContainerNode;
         },
 
-        addBadge: function(list, badgeText, badgeIcon, fontColor, badgeColor, fontSize, fontWeight) {
-            var badge = newBadge(badgeText, badgeIcon, fontColor, badgeColor, fontSize, fontWeight);
-
+        addBadge: function(fieldName, badgeText, badgeIcon, fontColor, badgeColor, fontSize, fontWeight) {
+            var badge = newBadge(fieldName, badgeText, badgeIcon, fontColor, badgeColor, fontSize, fontWeight);
             this.badgesContainer().innerHTML += badge.outerHTML;
         },
 
         processBadge: function(fieldName, iconName, fontColor, badgeColor, fontSize, fontWeight, reduceFunc, initialValue) {
             var result = this.cards.reduce(reduceFunc, initialValue);
             this[fieldName] = result;
-            this.addBadge(result, iconName, fontColor, badgeColor, fontSize, fontWeight);
+            this.addBadge(fieldName, result, iconName, fontColor, badgeColor, fontSize, fontWeight);
         },
 
         clear: function() {
-            for (var i = 0; i < this.cards.length; i++)
-            {
-                this.cards[i].clean();
-            }
+            this.cards.forEach((c) => c.clean());
         },
 
         process: function(config) {
