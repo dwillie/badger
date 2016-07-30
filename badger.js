@@ -51,15 +51,20 @@ newBadge = function(fieldName, text, icon, fontColor, badgeColor, fontSize, font
     if (fieldName === "dependency") {
         console.log('Adding event listeners for badge with content ' + text);
         badge.zIndex = 100000;
-        badge.addEventListener("mouseenter", function(event) {
-            var target  = document.getElementById(text);
-            target.style.boxShadow = "0px 0px 10em 2em #e73030";
-        });
-        badge.addEventListener("mouseleave", function(event) {
-            var target = document.getElementById(text);
-            target.style.zIndex    = "0";
-            target.style.boxShadow = "";
-        });
+        var target  = document.getElementById(text);
+        if (target) {
+            badge.addEventListener("mouseenter", function(event) {
+                target  = document.getElementById(text);
+                target.style.boxShadow = "0px 0px 10em 2em #e73030";
+            });
+            badge.addEventListener("mouseleave", function(event) {
+                target = document.getElementById(text);
+                target.style.zIndex    = "0";
+                target.style.boxShadow = "";
+            });
+        } else {
+            badge.style.backgroundColor = '#55AA55';
+        }
     }
 
     badge.style.fontSize = fontSize;
