@@ -18,6 +18,16 @@ chrome.runtime.onInstalled.addListener(function() {
                         fontWeight: "400"
                     },
                     {
+                        name: "Tags",
+                        field: "tags[]",
+                        icon: "tag",
+                        regex: "#([a-zA-Z]+)",
+                        textColor: "#fff",
+                        bgColor: "func",
+                        fontSize: "smaller",
+                        fontWeight: "400"
+                    },
+                    {
                         name: "Dependency",
                         field: "dependency",
                         icon: "asterisk",
@@ -34,16 +44,6 @@ chrome.runtime.onInstalled.addListener(function() {
                         regex: "\\(([0-9^\\)]+)\\)",
                         textColor: "#fff",
                         bgColor: "#55BB55",
-                        fontSize: "smaller",
-                        fontWeight: "400"
-                    },
-                    {
-                        name: "Tags",
-                        field: "tags[]",
-                        icon: "tag",
-                        regex: "#([a-zA-Z]+)",
-                        textColor: "#fff",
-                        bgColor: "func",
                         fontSize: "smaller",
                         fontWeight: "400"
                     },
