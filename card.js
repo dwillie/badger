@@ -31,8 +31,15 @@ function Card(node) {
             this.setText(cardText);
         },
 
+        initBadgesContainer: function() {
+            var labelsElem = this.node.getElementsByClassName("list-card-labels")[0];
+            var badgesContainer = document.createElement('div');
+            badgesContainer.classList.add("badger-badges");
+            labelsElem.parentNode.insertBefore(badgesContainer, labelsElem.nextSibling);
+        },
+
         badgesContainer: function() {
-            return this.node.getElementsByClassName("badges")[0];
+            return this.node.getElementsByClassName("badger-badges")[0];
         },
 
         text: function() {
@@ -97,5 +104,6 @@ function Card(node) {
     };
 
     card.initId();
+    card.initBadgesContainer();
     return card;
 }
