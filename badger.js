@@ -77,17 +77,13 @@ newBadge = function(fieldName, text, icon, fontColor, badgeColor, fontSize, font
 };
 
 refreshCycle = function(meta, config) {
-    for (var i = 0; i < meta.lists.length; i++) {
-        meta.lists[i].clear();
-    }
-
     for (i = 0; i < meta.lists.length; i++) {
-        meta.lists[i].process(config);
+        meta.lists[i].refresh(config);
     }
 
-    // setTimeout(function() {
-    //      refreshCycle(meta);
-    //}, 2500);
+    setTimeout(function() {
+         refreshCycle(meta);
+    }, 2000);
 };
 
 loadMeta = function(meta) {
@@ -116,6 +112,9 @@ start = function(config) {
         lists: []
     };
     loadMeta(meta);
+    for (i = 0; i < meta.lists.length; i++) {
+        meta.lists[i].process(config);
+    }
     refreshCycle(meta, config);
 };
 

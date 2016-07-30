@@ -31,21 +31,9 @@ function List(pageIndex, node, cards) {
             this.addBadge(fieldName, result, iconName, fontColor, badgeColor, fontSize, fontWeight);
         },
 
-        clear: function() {
-            this.cards.forEach((c) => c.clean());
-        },
-
         process: function(config) {
             var fontColor = "#FFF", fontSize = "smaller", fontWeight = "400";
-            for (var i = 0; i < this.cards.length; i++)
-            {
-                for (var j = 0; j < config.cardBadges.length; j++) {
-                    var badgeConf = config.cardBadges[j];
-                    this.cards[i].processBadge(badgeConf.regex, badgeConf.field, badgeConf.icon,
-                                               badgeConf.textColor, badgeConf.bgColor,
-                                               badgeConf.fontSize, badgeConf.fontWeight);
-                }
-            }
+            this.cards.forEach(function(card) { card.processBadges(); });
 
             for (var k = 0; k < config.listBadges.length; k++) {
                 var listBadgeConf = config.listBadges[k];
@@ -54,6 +42,10 @@ function List(pageIndex, node, cards) {
                                   listBadgeConf.fontSize,  listBadgeConf.fontWeight,
                                   listBadgeConf.reduce,    listBadgeConf.reduceInit);
             }
+        },
+
+        refresh: function() {
+            this.cards.forEach(function(card) { card.refresh(); });
         }
     };
 }

@@ -12,3 +12,13 @@
 .pointy-list-badges > .badge {
   float: right;
 }
+
+.visible-text-override {
+  clear: both;
+  display: block;
+  font-weight: 400;
+  margin: 2px 0 4px;
+  overflow: hidden;
+  text-decoration: none;
+  word-wrap: break-word;
+}

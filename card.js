@@ -3,10 +3,10 @@ function Card(node) {
         id: undefined,
         badgesContainerNode: undefined,
         node: node,
-        originalText: node.getElementsByClassName("js-card-name")[0].innerHTML,
+        oldRealText: undefined,
 
         initId: function() {
-            var cardText     = this.text();
+            var cardText     = this.realText();
             var regexMatches = cardText.matchAll(new RegExp("#([0-9]+)", "g"));
             if (!regexMatches || regexMatches.length < 1) {
                 return;
@@ -28,7 +28,30 @@ function Card(node) {
                 }
             }
 
-            this.setText(cardText);
+            this.setVisibleText(cardText);
+        },
+
+        refresh: function() {
+            console.log('Refreshing card.');
+            // If the card has been updated it's real text will have changed.
+            if (this.oldRealText !== this.realText()) {
+                console.log('Text has changed.');
+                this.cleanBadges();
+                this.oldRealText = this.realText();
+                this.setVisibleText(this.oldRealText);
+                this.processBadges();
+            }
+        },
+
+        initFakeText: function() {
+            var realTextElem = this.node.getElementsByClassName("js-card-name")[0];
+            this.oldRealText = realTextElem.innerHTML;
+
+            var fakeTextElem = realTextElem.cloneNode();
+            fakeTextElem.className = "visible-text-override";
+            realTextElem.style.display = 'none';
+
+            realTextElem.parentNode.insertBefore(fakeTextElem, realTextElem.nextSibling);
         },
 
         initBadgesContainer: function() {
@@ -42,12 +65,16 @@ function Card(node) {
             return this.node.getElementsByClassName("badger-badges")[0];
         },
 
-        text: function() {
+        realText: function() {
             return this.node.getElementsByClassName("js-card-name")[0].innerHTML;
         },
 
-        setText: function(text) {
-            this.node.getElementsByClassName("js-card-name")[0].innerHTML = text;
+        getVisibleText: function() {
+            return this.node.getElementsByClassName("visible-text-override")[0].innerHTML;
+        },
+
+        setVisibleText: function(text) {
+            this.node.getElementsByClassName("visible-text-override")[0].innerHTML = text;
         },
 
         addBadge: function(fieldName, badgeText, iconName, fontColor, badgeColor, fontSize, fontWeight) {
@@ -68,8 +95,17 @@ function Card(node) {
             }
         },
 
+        processBadges: function() {
+            for (var j = 0; j < config.cardBadges.length; j++) {
+                var badgeConf = config.cardBadges[j];
+                this.processBadge(badgeConf.regex, badgeConf.field, badgeConf.icon,
+                                  badgeConf.textColor, badgeConf.bgColor,
+                                  badgeConf.fontSize, badgeConf.fontWeight);
+            }
+        },
+
         processBadge: function(reg, fieldName, iconName, fontColor, badgeColor, fontSize, fontWeight) {
-            var cardText     = this.text();
+            var cardText     = this.getVisibleText();
             var regexMatches = cardText.matchAll(reg);
             if (!regexMatches || regexMatches.length < 1) {
                 return;
@@ -86,24 +122,18 @@ function Card(node) {
                 this.addBadge(fieldName, matchContents, iconName, fontColor, badgeColor, fontSize, fontWeight);
             }
 
-            this.setText(cardText);
+            this.setVisibleText(cardText);
         },
 
         cleanBadges: function() {
-            // TODO something less awful
             var badgesContainer = this.badgesContainer();
-            while (badgesContainer.getElementsByClassName("pointy-badge").length > 0) {
-                badgesContainer.getElementsByClassName("pointy-badge")[0].outerHTML = "";
-            }
-        },
-
-        clean: function() {
-            this.setText(this.originalText);
-            this.cleanBadges();
+            badgesContainer.innerHTML = "";
         }
     };
 
-    card.initId();
     card.initBadgesContainer();
+    card.initFakeText();
+    card.initId();
+
     return card;
 }
