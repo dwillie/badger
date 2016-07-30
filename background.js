@@ -95,7 +95,7 @@ chrome.runtime.onInstalled.addListener(function() {
                                 var weeks = Math.floor(result / 5);
                                 var days  = result % 5;
 
-                                if (result > 5) {
+                                if (result >= 5) {
                                     var res = '' + weeks + ' week' + (weeks > 1 ? 's' : '');
                                     if (days > 0) {
                                       res += ' and ' + days + ' day' + (days > 1 ? 's' : '');
