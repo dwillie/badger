@@ -17,7 +17,7 @@
 
     "content_scripts": [{
         "matches": [ "https://trello.com/b/*", "file:///*" ],
-        "js": [ "badger.js", "list.js", "card.js" ],
+        "js": [ "badger.js", "list.js", "card.js", "md5.js" ],
         "css": [
             "style.css"
         ]

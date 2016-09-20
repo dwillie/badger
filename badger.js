@@ -40,9 +40,13 @@ newBadge = function(fieldName, text, icon, fontColor, badgeColor, fontSize, font
 
     if (badgeColor === "func") {
         var hue = 0;
-        for (var i = 0; i < text.length; i++) { hue += text.charCodeAt(i); }
+        var md5hash = md5(text);
+        for (var i = 0; i < 5; i++) { hue += md5hash.charCodeAt(i) - 65; }
         hue = hue % 360;
-        badge.style.backgroundColor = ("hsl(" + hue.toString() + ", 45%, 60%)");
+        sat = hue % 32;
+        lit = hue % 28;
+
+        badge.style.backgroundColor = ("hsl(" + hue.toString() + ", " + (sat + 38).toString() + "%, " + (lit + 45).toString() + "%)");
     } else {
         badge.style.backgroundColor = badgeColor;
     }
